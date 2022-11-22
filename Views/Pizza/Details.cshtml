@@ -1,0 +1,16 @@
+﻿@model Pizza
+
+<div class="text-center">
+    <h1>@Model.Name</h1>
+    <div style="margin-inline: auto; width: 250px; height: 250px;">
+        <img src="@Model.Image" alt="@Model.Name" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    
+    <div class="mb-3">
+        <p>@Model.Description</p>
+        <div class="card-text">@Model.Price.ToString("0.00") €</div>
+        <div class="@(Model.IsAvailable ? "text-success" : "text-danger")">@(Model.IsAvailable ? "Disponibile" : "esaurito")</div>
+    </div>
+
+    <a href="@Url.Action("Index")" class="btn btn-primary">torna alla home</a>
+</div>
