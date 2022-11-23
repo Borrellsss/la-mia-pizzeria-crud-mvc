@@ -5,7 +5,9 @@
     <div style="margin-inline: auto; width: 250px; height: 250px;">
         <img src="@Model.Image" alt="@Model.Name" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
-    
+
+    <div class="mb-3">@(Model.CategoryId != null ? Model.Category.Name : "Nessuna categoria associata.")</div>
+
     <div class="mb-3">
         <p>@Model.Description</p>
         <div class="card-text">@Model.Price.ToString("0.00") €</div>
@@ -19,7 +21,7 @@
 
             @Html.AntiForgeryToken()
 
-            <button type="submit"href=" class="btn btn-danger">Cancella</button>
+            <button type="submit" class="btn btn-danger">Cancella</button>
         </form>
     </div>
 </div>

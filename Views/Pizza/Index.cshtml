@@ -12,6 +12,7 @@
                         <img src="@pizza.Image" class="card-img-top" alt="@pizza.Name">
                         <div class="card-body">
                             <h5 class="card-title">@pizza.Name</h5>
+                            <div>@(pizza.CategoryId != null ? pizza.Category.Name : "Nessuna categoria associata.")</div>
                             <div class="card-text">@pizza.Price.ToString("0.00") €</div>
                             <div class="card-text mb-3 @(pizza.IsAvailable ? "text-success" : "text-danger")">@(pizza.IsAvailable ? "Disponibile" : "esaurito")</div>
                             <a href="@Url.Action("Details", new {id = pizza.Id})" class="btn btn-primary mb-2" style="width: 100%;">vedi dettaglio</a>
@@ -20,7 +21,7 @@
 
                                 @Html.AntiForgeryToken()
 
-                                <button type="submit" href=" class="btn btn-danger" style="width: 100%;">Cancella</button>
+                                <button type="submit" class="btn btn-danger" style="width: 100%;">Cancella</button>
                             </form>
                         </div>
                     </div>

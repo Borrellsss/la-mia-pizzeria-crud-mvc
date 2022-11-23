@@ -1,37 +1,50 @@
-﻿@model Pizza
+﻿@using la_mia_pizzeria_static.Models.FormModels
+
+@model PizzaForm
 
 <div>
-    <form asp-controller="Pizza" asp-action="Update" asp-route-id="@Model.Id" method="POST">
+    <form asp-controller="Pizza" asp-action="Update" asp-route-id="@Model.Pizza.Id" method="POST">
 
         @Html.AntiForgeryToken()
 
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" asp-for="Name" placeholder="Nome">
-            <label asp-for="Name">Nome</label>
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <input type="text" class="form-control" asp-for="Pizza.Name" placeholder="Nome">
+            <label asp-for="Pizza.Name">Nome</label>
+            <span asp-validation-for="Pizza.Name" class="text-danger"></span>
         </div>
 
         <div class="form-floating mb-3">
-            <textarea asp-for="Description" class="form-control" placeholder="Descrizione"></textarea>
-            <label asp-for="Description">Descrizione</label>
-            <span asp-validation-for="Description" class="text-danger"></span>
+            <textarea asp-for="Pizza.Description" class="form-control" placeholder="Descrizione"></textarea>
+            <label asp-for="Pizza.Description">Descrizione</label>
+            <span asp-validation-for="Pizza.Description" class="text-danger"></span>
         </div>
 
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" asp-for="Image" placeholder="Url foto">
-            <label asp-for="Image">Url foto</label>
-            <span asp-validation-for="Image" class="text-danger"></span>
+            <input type="text" class="form-control" asp-for="Pizza.Image" placeholder="Url foto">
+            <label asp-for="Pizza.Image">Url foto</label>
+            <span asp-validation-for="Pizza.Image" class="text-danger"></span>
         </div>
 
         <div class="form-floating mb-3">
-            <input class="form-control" asp-for="Price" placeholder="Prezzo">
-            <label asp-for="Price">Prezzo</label>
-            <span asp-validation-for="Price" class="text-danger"></span>
+            <input class="form-control" asp-for="Pizza.Price" placeholder="Prezzo">
+            <label asp-for="Pizza.Price">Prezzo</label>
+            <span asp-validation-for="Pizza.Price" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-select-label" asp-for="Pizza.CategoryId">Categoria</label>
+            <select asp-for="Pizza.CategoryId">
+                @foreach (Category category in Model.Categories)
+                {
+                        <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+            <span asp-validation-for="Pizza.CategoryId" class="text-danger"></span>
         </div>
 
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" asp-for="IsAvailable">
-            <label class="form-check-label" asp-for="IsAvailable">Disponibilità</label>
+            <input class="form-check-input" type="checkbox" asp-for="Pizza.IsAvailable">
+            <label class="form-check-label" asp-for="Pizza.IsAvailable">Disponibilità</label>
         </div>
 
         <button type="submit" class="btn btn-primary">Modifica pizza</button>

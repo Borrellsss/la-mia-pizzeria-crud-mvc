@@ -7,18 +7,10 @@ namespace la_mia_pizzeria_static.Models
     {
         public Pizza()
         {
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
 
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
         }
         public Pizza(string name, string description, string image, double price, bool isAvailable)
         {
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
             Name = name;
             Description = description;
             Image = image;
@@ -45,5 +37,7 @@ namespace la_mia_pizzeria_static.Models
         [Range(0.10, Double.MaxValue, ErrorMessage = "Il prezzo non può essere minore di 0,10 euro")]
         public double Price { get; set; }
         public bool IsAvailable { get; set; }
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; }
     }
 }
