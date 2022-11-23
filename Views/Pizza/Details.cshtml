@@ -12,5 +12,14 @@
         <div class="@(Model.IsAvailable ? "text-success" : "text-danger")">@(Model.IsAvailable ? "Disponibile" : "esaurito")</div>
     </div>
 
-    <a href="@Url.Action("Index")" class="btn btn-primary">torna alla home</a>
+    <div class="d-flex" style="margin-inline: auto; width: fit-content; gap: 1rem;">
+        <a href="@Url.Action("Index")" class="btn btn-primary">torna alla home</a>
+        <a href="@Url.Action("Update", new {id = Model.Id})" class="btn btn-warning">modifica</a>
+        <form asp-controller="Pizza" asp-action="Delete" asp-route-id="@Model.Id" method="POST">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit"href=" class="btn btn-danger">Cancella</button>
+        </form>
+    </div>
 </div>

@@ -13,8 +13,15 @@
                         <div class="card-body">
                             <h5 class="card-title">@pizza.Name</h5>
                             <div class="card-text">@pizza.Price.ToString("0.00") €</div>
-                            <div class="card-text @(pizza.IsAvailable ? "text-success" : "text-danger")">@(pizza.IsAvailable ? "Disponibile" : "esaurito")</div>
-                            <a href="@Url.Action("Details", new {id = pizza.Id})" class="btn btn-primary">vedi dettaglio</a>
+                            <div class="card-text mb-3 @(pizza.IsAvailable ? "text-success" : "text-danger")">@(pizza.IsAvailable ? "Disponibile" : "esaurito")</div>
+                            <a href="@Url.Action("Details", new {id = pizza.Id})" class="btn btn-primary mb-2" style="width: 100%;">vedi dettaglio</a>
+                            <a href="@Url.Action("Update", new {id = pizza.Id})" class="btn btn-warning mb-2" style="width: 100%;">modifica</a>
+                            <form asp-controller="Pizza" asp-action="Delete" asp-route-id="@pizza.Id" method="POST">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" href=" class="btn btn-danger" style="width: 100%;">Cancella</button>
+                            </form>
                         </div>
                     </div>
                 </div>
