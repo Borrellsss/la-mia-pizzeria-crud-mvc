@@ -19,7 +19,6 @@ namespace la_mia_pizzeria_static.Controllers
             List<Pizza> pizzas = db.Pizzas.Include("Category").Include("Ingredients").ToList<Pizza>();
             return View(pizzas);
         }
-
         public IActionResult Details(int id)
         {
             Pizza pizza = db.Pizzas.Include("Category").Include("Ingredients").Where(p => p.Id == id).First();
@@ -53,12 +52,15 @@ namespace la_mia_pizzeria_static.Controllers
 
             pizzaFormData.Pizza.Ingredients = new List<Ingredient>();
 
-            foreach (int IngredientId in pizzaFormData.SelectedIngredients)
+            if (pizzaFormData.SelectedIngredients.Count() > 0)
             {
-                Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
-                pizzaFormData.Pizza.Ingredients.Add(selectedIngredient);
+                foreach (int IngredientId in pizzaFormData.SelectedIngredients)
+                {
+                    Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
+                    pizzaFormData.Pizza.Ingredients.Add(selectedIngredient);
+                }
             }
-            
+
             db.Pizzas.Add(pizzaFormData.Pizza);
             db.SaveChanges();
 
@@ -70,12 +72,20 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Update(int id)
         {
             PizzaForm pizzaFormData = new PizzaForm();
-            pizzaFormData.Pizza = db.Pizzas.Find(id);
-            pizzaFormData.Categories = db.Categories.ToList<Category>();
+            pizzaFormData.Pizza = db.Pizzas.Include("Ingredients").Where(p => p.Id == id).First();
 
             if (pizzaFormData.Pizza == null)
             {
                 return NotFound();
+            }
+
+            pizzaFormData.Categories = db.Categories.ToList<Category>();
+            pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+            pizzaFormData.SelectedIngredients = new List<int>();
+
+            foreach (Ingredient ingredient in pizzaFormData.Pizza.Ingredients)
+            {
+                pizzaFormData.SelectedIngredients.Add(ingredient.Id);
             }
 
             return View(pizzaFormData);
@@ -85,14 +95,21 @@ namespace la_mia_pizzeria_static.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Update(int id, PizzaForm pizzaFormData)
         {
+            Pizza pizzaToUpdate = db.Pizzas.Include("Ingredients").Where(p => p.Id == id).First();
+
             if (!ModelState.IsValid)
             {
-                pizzaFormData.Pizza = db.Pizzas.Find(id);
+                pizzaFormData.Pizza = pizzaToUpdate;
                 pizzaFormData.Categories = db.Categories.ToList<Category>();
+                pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+
+                if (pizzaFormData.SelectedIngredients == null)
+                {
+                    pizzaFormData.SelectedIngredients = new List<int>();
+                }
+
                 return View(pizzaFormData);
             }
-
-            Pizza pizzaToUpdate = db.Pizzas.Find(id);
 
             if(pizzaToUpdate == null)
             {
@@ -106,6 +123,24 @@ namespace la_mia_pizzeria_static.Controllers
             pizzaToUpdate.IsAvailable = pizzaFormData.Pizza.IsAvailable;
             pizzaToUpdate.CategoryId = pizzaFormData.Pizza.CategoryId;
 
+            if(pizzaToUpdate.Ingredients != null)
+            {
+                pizzaToUpdate.Ingredients.Clear();
+            }
+            else
+            {
+                pizzaToUpdate.Ingredients = new List<Ingredient>();
+            }
+
+            if(pizzaFormData.SelectedIngredients != null)
+            {
+                foreach (int IngredientId in pizzaFormData.SelectedIngredients)
+                {
+                    Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
+                    pizzaToUpdate.Ingredients.Add(selectedIngredient);
+                }
+            }
+            
             db.SaveChanges();
 
             return RedirectToAction("Details", new { id = pizzaToUpdate.Id });

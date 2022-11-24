@@ -42,6 +42,16 @@
             <span asp-validation-for="Pizza.CategoryId" class="text-danger"></span>
         </div>
 
+        <div class="mb-3">
+            @foreach (Ingredient ingredient in Model.Ingredients)
+            {
+                <div class="form-check">
+                    <input type="checkbox" id="@($"ingredient_{ingredient.Id}")" name="SelectedIngredients" value="@ingredient.Id" @(Model.SelectedIngredients.Contains(ingredient.Id) ? "checked" : "")>
+                    <label class="form-check-label" for="@($"ingredient_{ingredient.Id}")">@ingredient.Name</label>
+                </div>
+            }
+        </div>
+
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" asp-for="Pizza.IsAvailable">
             <label class="form-check-label" asp-for="Pizza.IsAvailable">Disponibilità</label>

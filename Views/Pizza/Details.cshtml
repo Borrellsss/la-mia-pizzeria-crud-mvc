@@ -6,9 +6,10 @@
         <img src="@Model.Image" alt="@Model.Name" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
 
-    <h5>Ingredienti: </h5>
+    <h5>Ingredienti:</h5>
     <div class="d-flex" style="margin-inline: auto; width: fit-content; gap: 0.5rem;">
-        @foreach(Ingredient ingredient in Model.Ingredients) {
+        @foreach(Ingredient ingredient in Model.Ingredients)
+        {
             <span class="badge bg-primary">@ingredient.Name</span>
         }
     </div>
