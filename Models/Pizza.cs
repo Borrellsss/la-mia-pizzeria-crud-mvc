@@ -39,5 +39,6 @@ namespace la_mia_pizzeria_static.Models
         public bool IsAvailable { get; set; }
         public int? CategoryId { get; set; }
         public Category? Category { get; set; }
+        public List<Ingredient>? Ingredients { get; set; }
     }
 }

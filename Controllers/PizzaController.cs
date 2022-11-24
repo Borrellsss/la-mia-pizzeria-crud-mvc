@@ -9,7 +9,6 @@ namespace la_mia_pizzeria_static.Controllers
     public class PizzaController : Controller
     {
         private PizzeriaDbContext db;
-
         public PizzaController()
         {
             db = new PizzeriaDbContext();
