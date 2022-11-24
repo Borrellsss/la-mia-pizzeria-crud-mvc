@@ -3,6 +3,7 @@ using la_mia_pizzeria_static.Models;
 using la_mia_pizzeria_static.Models.FormModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace la_mia_pizzeria_static.Controllers
 {
@@ -15,19 +16,21 @@ namespace la_mia_pizzeria_static.Controllers
         }
         public IActionResult Index()
         {
-            List<Pizza> pizzas = db.Pizzas.Include("Category").ToList<Pizza>();
+            List<Pizza> pizzas = db.Pizzas.Include("Category").Include("Ingredients").ToList<Pizza>();
             return View(pizzas);
         }
 
         public IActionResult Details(int id)
         {
-            Pizza pizza = db.Pizzas.Include("Category").Where(p => p.Id == id).First();
+            Pizza pizza = db.Pizzas.Include("Category").Include("Ingredients").Where(p => p.Id == id).First();
             return View(pizza);
         }
         public IActionResult Create()
         {
             PizzaForm pizzaFormData = new PizzaForm();
             pizzaFormData.Categories = db.Categories.ToList<Category>();
+            pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+            pizzaFormData.SelectedIngredients = new List<int>();
             return View(pizzaFormData);
         }
 
@@ -38,9 +41,24 @@ namespace la_mia_pizzeria_static.Controllers
             if (!ModelState.IsValid)
             {
                 pizzaFormData.Categories = db.Categories.ToList<Category>();
+                pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+
+                if(pizzaFormData.SelectedIngredients == null)
+                {
+                    pizzaFormData.SelectedIngredients = new List<int>();
+                }
+
                 return View(pizzaFormData);
             }
 
+            pizzaFormData.Pizza.Ingredients = new List<Ingredient>();
+
+            foreach (int IngredientId in pizzaFormData.SelectedIngredients)
+            {
+                Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
+                pizzaFormData.Pizza.Ingredients.Add(selectedIngredient);
+            }
+            
             db.Pizzas.Add(pizzaFormData.Pizza);
             db.SaveChanges();
 

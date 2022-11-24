@@ -6,6 +6,13 @@
         <img src="@Model.Image" alt="@Model.Name" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
 
+    <h5>Ingredienti: </h5>
+    <div class="d-flex" style="margin-inline: auto; width: fit-content; gap: 0.5rem;">
+        @foreach(Ingredient ingredient in Model.Ingredients) {
+            <span class="badge bg-primary">@ingredient.Name</span>
+        }
+    </div>
+
     <div class="mb-3">@(Model.CategoryId != null ? Model.Category.Name : "Nessuna categoria associata.")</div>
 
     <div class="mb-3">
