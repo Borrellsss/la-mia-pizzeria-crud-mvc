@@ -1,6 +1,7 @@
 ﻿using la_mia_pizzeria_static.Data;
 using la_mia_pizzeria_static.Models;
 using la_mia_pizzeria_static.Models.FormModels;
+using la_mia_pizzeria_static.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,26 +10,30 @@ namespace la_mia_pizzeria_static.Controllers
 {
     public class PizzaController : Controller
     {
-        private PizzeriaDbContext db;
+        private DbPizzaRepository dbPizzaRepository;
+        private DbCategoryRepository dbCategoryRepository;
+        private DbIngredientRepository dbIngredientRepository;
         public PizzaController()
         {
-            db = new PizzeriaDbContext();
+            dbPizzaRepository = new DbPizzaRepository();
+            dbCategoryRepository = new DbCategoryRepository();
+            dbIngredientRepository = new DbIngredientRepository();
         }
         public IActionResult Index()
         {
-            List<Pizza> pizzas = db.Pizzas.Include("Category").Include("Ingredients").ToList<Pizza>();
+            List<Pizza> pizzas = dbPizzaRepository.GetAll(true, true);
             return View(pizzas);
         }
         public IActionResult Details(int id)
         {
-            Pizza pizza = db.Pizzas.Include("Category").Include("Ingredients").Where(p => p.Id == id).First();
+            Pizza pizza = dbPizzaRepository.GetById(id, true, true);
             return View(pizza);
         }
         public IActionResult Create()
         {
             PizzaForm pizzaFormData = new PizzaForm();
-            pizzaFormData.Categories = db.Categories.ToList<Category>();
-            pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+            pizzaFormData.Categories = dbCategoryRepository.GetAll(false);
+            pizzaFormData.Ingredients = dbIngredientRepository.GetAll(false);
             pizzaFormData.SelectedIngredients = new List<int>();
             return View(pizzaFormData);
         }
@@ -39,10 +44,10 @@ namespace la_mia_pizzeria_static.Controllers
         {
             if (!ModelState.IsValid)
             {
-                pizzaFormData.Categories = db.Categories.ToList<Category>();
-                pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+                pizzaFormData.Categories = dbCategoryRepository.GetAll(false);
+                pizzaFormData.Ingredients = dbIngredientRepository.GetAll(false);
 
-                if(pizzaFormData.SelectedIngredients == null)
+                if (pizzaFormData.SelectedIngredients == null)
                 {
                     pizzaFormData.SelectedIngredients = new List<int>();
                 }
@@ -56,15 +61,14 @@ namespace la_mia_pizzeria_static.Controllers
             {
                 foreach (int IngredientId in pizzaFormData.SelectedIngredients)
                 {
-                    Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
+                    Ingredient selectedIngredient = dbIngredientRepository.GetById(IngredientId, false);
                     pizzaFormData.Pizza.Ingredients.Add(selectedIngredient);
                 }
             }
 
-            db.Pizzas.Add(pizzaFormData.Pizza);
-            db.SaveChanges();
+            dbPizzaRepository.Create(pizzaFormData.Pizza);
 
-            Pizza _pizza = db.Pizzas.OrderBy(p => p.Id).Last();
+            Pizza _pizza = dbPizzaRepository.GetLast(false, false);
 
             return RedirectToAction("Details", new { id = _pizza.Id });
         }
@@ -72,15 +76,15 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Update(int id)
         {
             PizzaForm pizzaFormData = new PizzaForm();
-            pizzaFormData.Pizza = db.Pizzas.Include("Ingredients").Where(p => p.Id == id).First();
+            pizzaFormData.Pizza = dbPizzaRepository.GetById(id, false, true);
 
             if (pizzaFormData.Pizza == null)
             {
                 return NotFound();
             }
 
-            pizzaFormData.Categories = db.Categories.ToList<Category>();
-            pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+            pizzaFormData.Categories = dbCategoryRepository.GetAll(false);
+            pizzaFormData.Ingredients = dbIngredientRepository.GetAll(false);
             pizzaFormData.SelectedIngredients = new List<int>();
 
             foreach (Ingredient ingredient in pizzaFormData.Pizza.Ingredients)
@@ -95,13 +99,13 @@ namespace la_mia_pizzeria_static.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Update(int id, PizzaForm pizzaFormData)
         {
-            Pizza pizzaToUpdate = db.Pizzas.Include("Ingredients").Where(p => p.Id == id).First();
+            Pizza pizzaToUpdate = dbPizzaRepository.GetById(id, false, true);
 
             if (!ModelState.IsValid)
             {
                 pizzaFormData.Pizza = pizzaToUpdate;
-                pizzaFormData.Categories = db.Categories.ToList<Category>();
-                pizzaFormData.Ingredients = db.Ingredients.ToList<Ingredient>();
+                pizzaFormData.Categories = dbCategoryRepository.GetAll(false);
+                pizzaFormData.Ingredients = dbIngredientRepository.GetAll(false);
 
                 if (pizzaFormData.SelectedIngredients == null)
                 {
@@ -116,32 +120,7 @@ namespace la_mia_pizzeria_static.Controllers
                 return NotFound();
             }
 
-            pizzaToUpdate.Name = pizzaFormData.Pizza.Name;
-            pizzaToUpdate.Description = pizzaFormData.Pizza.Description;
-            pizzaToUpdate.Image = pizzaFormData.Pizza.Image;
-            pizzaToUpdate.Price = pizzaFormData.Pizza.Price;
-            pizzaToUpdate.IsAvailable = pizzaFormData.Pizza.IsAvailable;
-            pizzaToUpdate.CategoryId = pizzaFormData.Pizza.CategoryId;
-
-            if(pizzaToUpdate.Ingredients != null)
-            {
-                pizzaToUpdate.Ingredients.Clear();
-            }
-            else
-            {
-                pizzaToUpdate.Ingredients = new List<Ingredient>();
-            }
-
-            if(pizzaFormData.SelectedIngredients != null)
-            {
-                foreach (int IngredientId in pizzaFormData.SelectedIngredients)
-                {
-                    Ingredient selectedIngredient = db.Ingredients.Find(IngredientId);
-                    pizzaToUpdate.Ingredients.Add(selectedIngredient);
-                }
-            }
-            
-            db.SaveChanges();
+            dbPizzaRepository.Update(pizzaToUpdate, pizzaFormData); 
 
             return RedirectToAction("Details", new { id = pizzaToUpdate.Id });
         }
@@ -150,15 +129,14 @@ namespace la_mia_pizzeria_static.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            Pizza pizzaToDelete = db.Pizzas.Find(id);
+            Pizza pizzaToDelete = dbPizzaRepository.GetById(id, false, false);
 
             if (pizzaToDelete == null)
             {
                 return NotFound();
             }
 
-            db.Pizzas.Remove(pizzaToDelete);
-            db.SaveChanges();
+            dbPizzaRepository.Delete(pizzaToDelete);
 
             return RedirectToAction("Index");
         }
