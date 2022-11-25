@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace la_mia_pizzeria_static.Models.Repositories
 {
-    public class DbIngredientRepository
+    public class DbIngredientRepository : IDbIngredientRepository
     {
         private PizzeriaDbContext db = PizzeriaDbContext.Instance;
         public List<Ingredient> GetAll(bool pizzas)

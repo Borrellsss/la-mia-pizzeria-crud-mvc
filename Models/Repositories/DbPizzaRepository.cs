@@ -4,20 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace la_mia_pizzeria_static.Models.Repositories
 {
-    public class DbPizzaRepository
+    public class DbPizzaRepository : IDbPizzaRepository
     {
         private PizzeriaDbContext db = PizzeriaDbContext.Instance;
         public List<Pizza> GetAll(bool category, bool ingredients)
         {
-            if(category && ingredients)
+            if (category && ingredients)
             {
                 return db.Pizzas.Include("Category").Include("Ingredients").ToList();
             }
-            else if(category)
+            else if (category)
             {
                 return db.Pizzas.Include("Category").ToList();
             }
-            else if(ingredients)
+            else if (ingredients)
             {
                 return db.Pizzas.Include("Ingredients").ToList();
             }
@@ -39,7 +39,7 @@ namespace la_mia_pizzeria_static.Models.Repositories
             {
                 return db.Pizzas.Include("Ingredients").Where(p => p.Id == id).First();
             }
-            
+
             return db.Pizzas.Where(p => p.Id == id).First();
         }
         public Pizza GetLast(bool category, bool ingredients)
